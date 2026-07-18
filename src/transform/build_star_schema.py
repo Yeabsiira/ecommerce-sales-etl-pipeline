@@ -21,12 +21,13 @@ def generate_date_dimension(df_fact_base):
     df_date = df_date.drop_duplicates(subset=["date_id"])
     return df_date
 
-def assemble_star_schema(extracted_data, clean_cust, clean_prod, clean_ord):
+def assemble_star_schema(extracted_data, clean_cust, clean_prod, clean_ord, clean_sell):
     """Assembles all components into the final Star Schema structure."""
     
     # 1. Transform individual dimensions
     dim_customers = clean_cust(extracted_data["customers"])
     dim_products = clean_prod(extracted_data["products"], extracted_data["category_translation"])
+    dim_sellers = clean_sell(extracted_data["sellers"])
     
     # 2. Transform raw transactional data into base facts
     df_fact_base = clean_ord(
@@ -61,6 +62,7 @@ def assemble_star_schema(extracted_data, clean_cust, clean_prod, clean_ord):
     return {
         "dim_customers": dim_customers,
         "dim_products": dim_products,
+        "dim_sellers": dim_sellers,
         "dim_date": dim_date,
         "fact_orders": fact_orders
-    }
+    }

@@ -33,8 +33,8 @@ def load_star_schema(star_schema_dfs):
         
     print("✅ Schema architecture successfully deployed to PostgreSQL.")
 
-    # 2. Bulk stream dimensions first
-    dimensions = ["dim_customers", "dim_products", "dim_date"]
+    # 2. Bulk stream dimensions first (order matters for FK constraints)
+    dimensions = ["dim_customers", "dim_products", "dim_sellers", "dim_date"]
     for dim in dimensions:
         print(f"📥 Streaming dataframe into dimension table: {dim}...")
         star_schema_dfs[dim].to_sql(name=dim, con=engine, if_exists="append", index=False, method="multi", chunksize=10000)
