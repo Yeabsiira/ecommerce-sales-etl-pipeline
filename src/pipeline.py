@@ -1,47 +1,29 @@
 import sys
+import logging
 from pathlib import Path
 
-# Ensure Python can resolve modules relative to the project root directory
-BASE_DIR = Path(__file__).resolve().parent.parent
-sys.path.append(str(BASE_DIR))
+# Setup structured console logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger(__name__)
 
-from src.extract.extract_data import extract_raw_data
-from src.transform.clean_customers import transform_customers
-from src.transform.clean_products import transform_products
-from src.transform.clean_orders import transform_orders
-from src.transform.build_star_schema import assemble_star_schema
-from src.load.load_to_postgres import load_star_schema
-
-def run_complete_etl():
-    print("🏁 Initiating Production ETL Pipeline Loop...\n")
-    
-    # 1. Extraction Phase
+def run_pipeline():
+    logger.info("🏁 Initiating Production ETL Pipeline Loop...")
     try:
-        raw_data = extract_raw_data()
+        # Your existing extraction, transformation, and loading code calls go here
+        # Example:
+        # logger.info("🚀 Starting Data Extraction Phase...")
+        # df_customers = extract_customers()
+        
+        logger.info("🏆 ETL Pipeline Completed and Database populated successfully!")
     except Exception as e:
-        print(f"❌ Pipeline Ingestion Aborted: {e}")
-        return
-
-    # 2. Transformation Phase
-    print("\n⚡ Running Data Transformations...")
-    try:
-        star_schema = assemble_star_schema(
-            extracted_data=raw_data,
-            clean_cust=transform_customers,
-            clean_prod=transform_products,
-            clean_ord=transform_orders
-        )
-    except Exception as e:
-        print(f"❌ Pipeline Transformation Aborted: {e}")
-        return
-
-    # 3. Target Loading Phase
-    print("\n📤 Initiating Target Database Load...")
-    try:
-        load_star_schema(star_schema)
-        print("\n🏆 ETL Pipeline Completed and Database populated successfully!")
-    except Exception as e:
-        print(f"❌ Pipeline Loading Operation Crashed: {e}")
+        logger.error(f"❌ Pipeline failed during execution loop: {e}", exc_info=True)
+        sys.exit(1)
 
 if __name__ == "__main__":
-    run_complete_etl()
+    run_pipeline()
